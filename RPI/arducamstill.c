@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 #define LOG(fmt, args...) fprintf(stderr, fmt "\n", ##args)
-#define SET_CONTROL 0
+#define SET_CONTROL  //*********************************
 
 typedef struct
 {
@@ -25,6 +25,7 @@ enum
    CommandAutowhitebalance,
    CommandAutoexposure,
    CommandHelp,
+   CommandFocus, //*********************************
    
 };
 
@@ -33,19 +34,24 @@ static COMMAND_LIST cmdline_commands[] =
    { CommandTimeout, "-timeout",    "t",  "Time (in ms) before takes picture and shuts down (if not specified, loop)", 1 },
    { CommandQuality, "-quality",    "q",  "Set jpeg quality <0 to 100>", 1 },
    { CommandMode, "-mode",    "m",    "Set sensor mode", 1},
-   { CommandAutowhitebalance, "-autowhitebalance",    "awb",    "Enable or disable awb", 1 },
-   { CommandAutoexposure, "-autoexposure",    "ae",    "Enable or disable ae", 1 },
-   { CommandHelp, "-help",    "?",    "This help information", 0},
-   
+   { CommandAutowhitebalance, "-autowhitebalance",    "awb",    "Enable or disable awb", 1 },
+
+   { CommandAutoexposure, "-autoexposure",    "ae",    "Enable or disable ae", 1 },
+
+   { CommandHelp, "-help",    "?",    "This help information", 0},
+   { CommandFocus, "-focus", "f", "Set focus value of camera", 1}, //*********************************
+
 };
 
 typedef struct
 {
    int timeout;                        // Time taken before frame is grabbed and app then shuts down. Units are milliseconds
    int quality;                        // JPEG quality setting (1-100)
-   int mode;                         // sensor mode
+   int mode;                           // sensor mode
    int awb_state;                      // auto white balance state
    int ae_state;                       // auto exposure state
+   int focus; 					       // (auto) focus state *********************************
+
 } RASPISTILL_STATE;
 
 
@@ -149,11 +155,15 @@ int main(int argc, char **argv) {
             usleep(1000 * state.timeout);
         }
     
-#if SET_CONTROL
-    LOG("Reset the focus...");
-    if (arducam_reset_control(camera_instance, V4L2_CID_FOCUS_ABSOLUTE)) {
-        LOG("Failed to set focus, the camera may not support this control.");
-    }
+#ifdef SET_CONTROL
+    /*LOG("Reset the focus to autofocus...");
+    if (arducam_reset_control(camera_instance, V4L2_CID_FOCUS_AUTO)) { //*********************************
+        LOG("Failed to set auto focus, the camera may not support this control.");
+    }*/
+    LOG("Setting the focus to the desired command value"); 
+    if (arducam_set_control(camera_instance, V4L2_CID_FOCUS_ABSOLUTE,state.focus)) { //*********************************
+        LOG("Failed to set desired focus value, the camera may not support this control.");
+    } 
     usleep(1000 * 1000 * 2);
     LOG("Setting the exposure...");
     if (arducam_set_control(camera_instance, V4L2_CID_EXPOSURE, 0x1F00)) {
@@ -172,7 +182,7 @@ int main(int argc, char **argv) {
     }
     usleep(1000 * 1000 * 2);
     LOG("Enable Auto Exposure...");
-    //arducam_software_auto_exposure(camera_instance, 1);
+    arducam_software_auto_exposure(camera_instance, 1); //*********************************
 
     usleep(1000 * 1000 * 2);
     LOG("Enable Auto White Balance...");
@@ -301,6 +311,18 @@ static int arducam_parse_cmdline(int argc, char **argv,RASPISTILL_STATE *state){
                     valid = 0;
                 break;
               } 
+             case CommandFocus: //*********************************
+              {
+                if (sscanf(argv[i + 1], "%d", &state->focus) == 1)
+                 {
+                  //  printf("state->ae_state = %d\r\n",state->ae_state);
+                    i++;
+                 }
+                else
+                    valid = 0;
+                break;
+              } //*********************************
+
             
         }
     }
@@ -321,6 +343,7 @@ static void default_status(RASPISTILL_STATE *state)
     state->awb_state = 1;
     state->quality = 50;
     state->timeout = 5000;
+    state->focus = 6500; //*********************************
 }
 
 
