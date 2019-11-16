@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
         LOG("init camera status = %d", res);
         return -1;
     }  
-    
+
     struct format support_fmt;
        int index = 0;
        char fourcc[5];
@@ -157,13 +157,27 @@ int main(int argc, char **argv) {
     
 #ifdef SET_CONTROL
     /*LOG("Reset the focus to autofocus...");
-    if (arducam_reset_control(camera_instance, V4L2_CID_FOCUS_AUTO)) { //*********************************
+    if (arducam_reset_control(camera_instance, V4L2_CID_FOCUS_AUTO)) { 
         LOG("Failed to set auto focus, the camera may not support this control.");
     }*/
     LOG("Setting the focus to the desired command value"); 
     if (arducam_set_control(camera_instance, V4L2_CID_FOCUS_ABSOLUTE,state.focus)) { //*********************************
         LOG("Failed to set desired focus value, the camera may not support this control.");
     } 
+    
+    usleep(1000 * 1000 * 2);
+    LOG("Enable Manual Red Balance...");
+    if (arducam_set_control(camera_instance, V4L2_CID_RED_BALANCE,2000)) { //*********************************
+        LOG("Failed to set desired focus value, the camera may not support this control.");
+    } 
+    
+    
+	 usleep(1000 * 1000 * 2);    
+    LOG("Enable Manual Blue Balance...");
+    if (arducam_set_control(camera_instance, V4L2_CID_BLUE_BALANCE,3000)) { //*********************************
+       LOG("Failed to set desired focus value, the camera may not support this control.");
+    }
+    
     usleep(1000 * 1000 * 2);
     LOG("Setting the exposure...");
     if (arducam_set_control(camera_instance, V4L2_CID_EXPOSURE, 0x1F00)) {
@@ -186,10 +200,18 @@ int main(int argc, char **argv) {
 
     usleep(1000 * 1000 * 2);
     LOG("Enable Auto White Balance...");
-    if (arducam_software_auto_white_balance(camera_instance, 1)) {
+    if (arducam_software_auto_white_balance(camera_instance,1)) {
         LOG("Mono camera does not support automatic white balance.");
     }
+    
+    /*usleep(1000 * 1000 * 2);
+    LOG("Enable Manual White Balance...");
+    arducam_manual_set_awb_compensation(0xFFFFFFFE,0);*/
+    
+     usleep(1000 * 1000 * 1000);
+        
 #endif
+
     LOG("Stop preview...");
     res = arducam_stop_preview(camera_instance);
     if (res) {

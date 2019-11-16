@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 #define LOG(fmt, args...) fprintf(stderr, fmt "\n", ##args)
-#define SET_CONTROL 1
+//#define SET_CONTROL 0
 
 int main(int argc, char **argv) {
     CAMERA_INSTANCE camera_instance;

@@ -4,6 +4,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
+#include <linux/v4l2-controls.h>
 
 #define VCOS_ALIGN_DOWN(p,n) (((ptrdiff_t)(p)) & ~((n)-1))
 #define VCOS_ALIGN_UP(p,n) VCOS_ALIGN_DOWN((ptrdiff_t)(p)+(n)-1,(n))
@@ -40,6 +41,10 @@ int main(int argc, char **argv) {
         LOG("init camera status = %d", res);
         return -1;
     }
+
+    //res = arducam_set_control(camera_instance,V4L2_CID_RED_BALANCE,4095);
+    //res = arducam_set_control(camera_instance,V4L2_CID_BLUE_BALANCE,0);
+    //LOG("RESET BALANCES");
 
     width = 1920;
     height = 1080;
