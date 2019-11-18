@@ -2,6 +2,7 @@ import cv2 #sudo apt-get install python-opencv
 import numpy as py
 import os
 import time
+import subprocess
 from subprocess import call
 
 try:
@@ -24,15 +25,25 @@ def sobel(img):
 
 def laplacian(img):
 	img_gray = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
-	img_sobel = cv2.Laplacian(img_gray,cv2.CV_16U) #need to figure out how adding this param changes the Sobel filter: cv2.CV_16U,1,1)  
+	img_sobel = cv2.Laplacian(img_gray,cv2.CV_16U)   
 	return cv2.mean(img_sobel)[0]
 	
 
 def calculation(camera):
+	#subprocess.call(["gcc","capture.c"])
+	#rawBMP = subprocess.call() #"./a.out"
+	#print('Getting BMP') 
+	#convert BMP to RGB array 
+	
 	rawCapture = PiRGBArray(camera) #allows you to obtain a 3D numpy array (rows,columns,colors) from an unencoded RGB capture 
+	print(rawCapture)	
 	camera.capture(rawCapture,format="bgr", use_video_port=True) 
 	image = rawCapture.array #sets the 
+	print('This is the rawCapture array')
+	print(image)
 	rawCapture.truncate(0) #empties the rawCapture array
+	print('This is the truncated rawCapture')
+	print(rawCapture.truncate(0))
 	return laplacian(image) 
 	
 	

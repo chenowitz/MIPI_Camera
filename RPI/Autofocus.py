@@ -25,7 +25,7 @@ def sobel(img):
 
 def laplacian(img):
 	img_gray = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
-	img_sobel = cv2.Laplacian(img_gray,cv2.CV_16U) #need to figure out how adding this param changes the Sobel filter: cv2.CV_16U,1,1)  
+	img_sobel = cv2.Laplacian(img_gray,cv2.CV_16U)   
 	return cv2.mean(img_sobel)[0]
 	
 
